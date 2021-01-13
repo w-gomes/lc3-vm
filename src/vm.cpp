@@ -288,12 +288,15 @@ auto Virtual_Machine::run() -> void {
       case Op_Code::RES:
         // unused
         this->abort();
+        break;
       case Op_Code::RTI:
         // unused
         this->abort();
+        break;
       default:
         // bad opcode
         this->abort();
+        break;
     }
   }
 }
