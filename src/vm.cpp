@@ -294,7 +294,6 @@ auto Virtual_Machine::run() -> void {
       default:
         // bad opcode
         this->abort();
-        break;
     }
   }
 }
