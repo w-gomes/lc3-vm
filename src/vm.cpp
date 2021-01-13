@@ -363,8 +363,8 @@ auto Virtual_Machine::sign_extend(tl::u16 x, int bit_count) const noexcept
 auto Virtual_Machine::update_flags(tl::u16 r) noexcept -> void {
   if (this->register_[r] == 0) {
     this->register_[Register::COND] = Condition_Flag::ZRO;
-  } else if (this->register_[r] >>
-             15) {  // 1 in the left-most bit indicates negative
+  } else if (this->register_[r] >> 15) {
+    // 1 in the left-most bit indicates negative
     this->register_[Register::COND] = Condition_Flag::NEG;
   } else {
     this->register_[Register::COND] = Condition_Flag::POS;
