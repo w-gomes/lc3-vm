@@ -47,9 +47,6 @@ class Virtual_Machine {
   auto read_file(const char *file) -> bool;
   auto memory_size() const -> tl::usize { return this->memory_.size(); }
 
-  // debug
-  tl::u16 get_addr(tl::u16 idx) const;
-
  private:
   // method
   auto sign_extend(tl::u16 x, int bit_count) const noexcept -> tl::u16;

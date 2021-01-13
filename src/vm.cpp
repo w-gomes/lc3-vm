@@ -10,10 +10,6 @@
 
 namespace vm {
 
-auto Virtual_Machine::get_addr(tl::u16 idx) const -> tl::u16 {
-  return this->memory_[idx];
-}
-
 auto Virtual_Machine::run() -> void {
   this->register_[Register::PC] = PC_START;
 
