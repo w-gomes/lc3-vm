@@ -1,0 +1,6 @@
+---
+Checks: '*,-fuchsia-*,-google-*,-zircon-*,-abseil-*,-android-*,-modernize-use-trailing-return-type,-llvm-*,-llvmlibc-*,-readability-else-after-return,
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*'
+FormatStyle: none
+...
