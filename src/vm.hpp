@@ -1,7 +1,6 @@
 #pragma once
 #include <array>
 #include <bitset>
-#include <fstream>
 
 #include "opcodes.hpp"
 #include "tl/numeric-aliases.hpp"
