@@ -347,11 +347,11 @@ auto Virtual_Machine::read_file(const char *file) -> bool {
       begin(rng), temp_buffer.size(), begin(this->memory_) + origin);
 
     read = true;
+    fclose(in);
   } else {
     fmt::print(stderr, "{}\n", "cannot open file.");
   }
 
-  fclose(in);
   return read;
 }
 
