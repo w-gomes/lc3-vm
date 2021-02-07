@@ -31,7 +31,7 @@ auto Virtual_Machine::run() -> void {
     switch (op.to_ulong()) {
       case Op_Code::BR: {
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto condition = (instruction.to_ulong() >> 9) & 0x7;
+        auto condition = (instruction >> 9).to_ulong() & 0x7;
         if (condition & this->register_[Register::COND]) {
           this->register_[Register::PC] += sign_extend(
             // NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -108,7 +108,7 @@ auto Virtual_Machine::run() -> void {
         } else {  // baseR mode, JSRR
 
           // NOLINTNEXTLINE(hicpp-signed-bitwise)
-          auto base_register = (instruction.to_ulong() >> 6) & 0x7;
+          auto base_register = (instruction >> 6).to_ulong() & 0x7;
           this->register_[Register::PC] =
             this->register_[static_cast<tl::u16>(base_register)];
         }
