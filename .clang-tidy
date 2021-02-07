@@ -1,5 +1,5 @@
 ---
-Checks: '*,-altera-*,-fuchsia-*,-google-*,-zircon-*,-abseil-*,-android-*,-darwin-*,-objc-*,-llvm-*,-llvmlibc-*,-mpi-*,-openmp-*,-readability-else-after-return,-modernize-use-trailing-return-type,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers'
+Checks: '*,-altera-*,-fuchsia-*,-google-*,-zircon-*,-abseil-*,-android-*,-darwin-*,-objc-*,-llvm-*,-llvmlibc-*,-mpi-*,-openmp-*,-readability-else-after-return,-modernize-use-trailing-return-type,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-readability-implicit-bool-conversion'
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 FormatStyle: none
