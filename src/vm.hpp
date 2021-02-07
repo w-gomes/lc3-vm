@@ -1,6 +1,5 @@
 #pragma once
 #include <array>
-#include <bitset>
 
 #include "opcodes.hpp"
 #include "tl/numeric-aliases.hpp"
@@ -43,16 +42,16 @@ class Virtual_Machine {
 
  public:
   auto run() -> void;
-  auto read_file(const char *file) -> bool;
-  auto memory_size() const -> tl::usize { return this->memory_.size(); }
+  [[nodiscard]] auto read_file(const char *file) -> bool;
+  [[nodiscard]] auto memory_size() const -> tl::usize {
+    return this->memory_.size();
+  }
 
  private:
   // method
-  auto sign_extend(tl::u16 x, int bit_count) const noexcept -> tl::u16;
   auto update_flags(tl::u16 r) noexcept -> void;
-  auto read_memory(tl::u16 addr) -> tl::u16;
+  [[nodiscard]] auto read_memory(tl::u16 addr) -> tl::u16;
   auto write_memory(tl::u16 addr, tl::u16 content) -> void;
-  auto destination(const std::bitset<16> &instr) const noexcept -> tl::u16;
   auto abort() noexcept -> void;
 
   // data

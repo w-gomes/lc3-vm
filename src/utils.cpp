@@ -1,9 +1,9 @@
 #include "utils.hpp"
 
 #include <conio.h>  // _kbhit
-#include <stdint.h>
 #include <windows.h>
 
+#include <cstdint>
 #include <cstdlib>
 
 #include "fmt/format.h"
@@ -35,3 +35,19 @@ auto handle_interrupt([[maybe_unused]] int signal) -> void {
   fmt::print("\n");
   std::exit(-2);
 }
+
+namespace vm {
+auto sign_extend(tl::u16 x, int bit_count) noexcept -> tl::u16 {
+  // extends a bit
+  // e.g. 5bit -> 16bit
+  //
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  if ((x >> (bit_count - 1)) & 1) { x |= (0xFFFF << bit_count); }
+  return x;
+}
+
+auto destination(const std::bitset<16> &instr) noexcept -> tl::u16 {
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  return static_cast<tl::u16>((instr >> 9).to_ulong() & 0x7);
+}
+}  // namespace vm
