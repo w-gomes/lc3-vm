@@ -356,8 +356,13 @@ auto Virtual_Machine::write_memory(tl::u16 addr, tl::u16 content) -> void {
 }
 
 auto Virtual_Machine::read_file(const char *file) -> bool {
+#ifdef _WIN32
   std::FILE *in = nullptr;
   fopen_s(&in, file, "rb");
+#else
+  std::FILE *in = std::fopen(file, "rb");
+#endif
+
   auto read{false};
 
   if (in) {
@@ -384,7 +389,7 @@ auto Virtual_Machine::read_file(const char *file) -> bool {
       begin(rng), temp_buffer.size(), begin(this->memory_) + origin);
 
     read = true;
-    fclose(in);  // NOLINT
+    std::fclose(in);  // NOLINT
   } else {
     fmt::print(stderr, "{}\n", "cannot open file.");
   }

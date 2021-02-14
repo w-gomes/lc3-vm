@@ -82,7 +82,7 @@ auto handle_interrupt([[maybe_unused]] int signal) -> void {
 #endif
 
 namespace vm {
-auto sign_extend(tl::u16 x, int bit_count) noexcept -> tl::u16 {
+auto sign_extend(tl::u16 x, tl::u16 bit_count) noexcept -> tl::u16 {
   // extends a bit
   // e.g. 5bit -> 16bit
   //
