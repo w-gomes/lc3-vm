@@ -19,8 +19,8 @@
 
 #include "fmt/format.h"
 
+// Input buffering windows
 #ifdef _WIN32
-// windows stuffs
 HANDLE hStdin = INVALID_HANDLE_VALUE;
 DWORD fdwMode;
 DWORD fdwOldMode;
@@ -41,14 +41,9 @@ auto disable_input_buffering() -> void {
 }
 
 auto restore_input_buffering() -> void { SetConsoleMode(hStdin, fdwOldMode); }
-
-auto handle_interrupt([[maybe_unused]] int signal) -> void {
-  restore_input_buffering();
-  fmt::print("\n");
-  std::exit(-2);
-}
 #endif
 
+// Input buffering linux
 #ifdef linux
 auto check_key() -> uint16_t {
   fd_set readfds;
@@ -73,13 +68,13 @@ auto disable_input_buffering() -> void {
 auto restore_input_buffering() -> void {
   tcsetattr(STDIN_FILENO, TCSANOW, &original_tio);
 }
+#endif
 
 auto handle_interrupt([[maybe_unused]] int signal) -> void {
   restore_input_buffering();
-  printf("\n");
-  exit(-2);
+  fmt::print("\n");
+  std::exit(-2);
 }
-#endif
 
 namespace vm {
 auto sign_extend(tl::u16 x, tl::u16 bit_count) noexcept -> tl::u16 {
