@@ -1,13 +1,25 @@
 #include "utils.hpp"
 
-#include <conio.h>  // _kbhit
-#include <windows.h>
+#ifdef _WIN32
+  #include <conio.h>  // _kbhit
+  #include <windows.h>
+#endif
+
+#ifdef linux
+  #include <fcntl.h>
+  #include <sys/mman.h>
+  #include <sys/termios.h>
+  #include <sys/time.h>
+  #include <sys/types.h>
+  #include <unistd.h>
+#endif
 
 #include <cstdint>
 #include <cstdlib>
 
 #include "fmt/format.h"
 
+#ifdef _WIN32
 // windows stuffs
 HANDLE hStdin = INVALID_HANDLE_VALUE;
 DWORD fdwMode;
@@ -35,6 +47,39 @@ auto handle_interrupt([[maybe_unused]] int signal) -> void {
   fmt::print("\n");
   std::exit(-2);
 }
+#endif
+
+#ifdef linux
+auto check_key() -> uint16_t {
+  fd_set readfds;
+  FD_ZERO(&readfds);
+  FD_SET(STDIN_FILENO, &readfds);
+
+  struct timeval timeout;
+  timeout.tv_sec  = 0;
+  timeout.tv_usec = 0;
+  return select(1, &readfds, NULL, NULL, &timeout) != 0;
+}
+
+struct termios original_tio;
+
+auto disable_input_buffering() -> void {
+  tcgetattr(STDIN_FILENO, &original_tio);
+  struct termios new_tio = original_tio;
+  new_tio.c_lflag &= ~ICANON & ~ECHO;
+  tcsetattr(STDIN_FILENO, TCSANOW, &new_tio);
+}
+
+auto restore_input_buffering() -> void {
+  tcsetattr(STDIN_FILENO, TCSANOW, &original_tio);
+}
+
+auto handle_interrupt([[maybe_unused]] int signal) -> void {
+  restore_input_buffering();
+  printf("\n");
+  exit(-2);
+}
+#endif
 
 namespace vm {
 auto sign_extend(tl::u16 x, int bit_count) noexcept -> tl::u16 {
