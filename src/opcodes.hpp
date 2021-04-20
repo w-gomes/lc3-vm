@@ -1,6 +1,10 @@
 #pragma once
 
 namespace vm {
+enum my_enum {
+  Apple,
+};
+
 enum Register {
   R0 = 0,
   R1,
@@ -52,6 +56,14 @@ enum Trap {
 enum Mapped_Reg {
   key_status_reg = 0xFE00,  // keyboard status, if a key is pressed
   key_data_reg   = 0xFE02,  // keyboard data, the pressed key
+};
 
+enum Mask {
+  Three_Bits   = 0x7,
+  Five_Bits    = 0x1F,
+  Six_Bits     = 0x3F,
+  Eight_Bits   = 0xFF,
+  Nine_Bits    = 0x1FF,
+  Sixteen_Bits = 0xFFFF,
 };
 }  // namespace vm

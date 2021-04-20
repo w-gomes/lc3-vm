@@ -10,7 +10,7 @@
 
 namespace vm {
 
-auto Virtual_Machine::run() -> void {
+auto Virtual_Machine::run() -> void {  // NOLINT
   this->register_[Register::PC] = PC_START;
 
   this->running_ = true;
@@ -19,19 +19,19 @@ auto Virtual_Machine::run() -> void {
 
   while (this->running_) {
     // load the instruction from memory
-    auto instruction =
+    const auto instruction =
       std::bitset<16>(this->read_memory(this->register_[Register::PC]));
 
     this->register_[Register::PC]++;  // increment the memory in PC
 
     // Instruction set is 16 bit. the first 4 bits store the opcode.
     // To get the opcodes we right-shift by 12.
-    auto op = instruction >> 12;
+    const auto op = instruction >> 12;
 
     switch (op.to_ulong()) {
       case Op_Code::BR: {
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto condition = (instruction >> 9).to_ulong() & 0x7;
+        const auto condition = (instruction >> 9).to_ulong() & 0x7;
         if (condition & this->register_[Register::COND]) {
           this->register_[Register::PC] += sign_extend(
             // NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -47,14 +47,14 @@ auto Virtual_Machine::run() -> void {
 
         // we do this because the registers are only 3 bits (INDEX)
         // 0b111
-        auto dr = destination(instruction);
+        const auto dr = destination(instruction);
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto sr1 = (instruction >> 6).to_ulong() & 0x7;
+        const auto sr1 = (instruction >> 6).to_ulong() & 0x7;
 
         if (instruction.test(5)) {  // immediate mode
           // bit [4:0] & 0b11111
           // NOLINTNEXTLINE(hicpp-signed-bitwise)
-          auto imm5 = instruction.to_ulong() & 0x1F;
+          const auto imm5 = instruction.to_ulong() & 0x1F;
           this->register_[dr] =
             this->register_[sr1] +
             sign_extend(static_cast<tl::u16>(imm5), 5);  // imm5 is 5bits.
@@ -62,7 +62,7 @@ auto Virtual_Machine::run() -> void {
         } else {  // register mode
 
           // NOLINTNEXTLINE(hicpp-signed-bitwise)
-          auto sr2            = instruction.to_ulong() & 0x7;
+          const auto sr2      = instruction.to_ulong() & 0x7;
           this->register_[dr] = this->register_[sr1] + this->register_[sr2];
         }
 
@@ -72,11 +72,12 @@ auto Virtual_Machine::run() -> void {
       }
       case Op_Code::LD: {
         // loads the content of an address
-        auto dr = destination(instruction);
+        const auto dr = destination(instruction);
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto pc_offset9      = instruction.to_ulong() & 0x1FF;
-        auto sext_pc_offset9 = sign_extend(static_cast<tl::u16>(pc_offset9), 9);
-        auto mem_location =
+        const auto pc_offset9 = instruction.to_ulong() & 0x1FF;
+        const auto sext_pc_offset9 =
+          sign_extend(static_cast<tl::u16>(pc_offset9), 9);
+        const auto mem_location =
           tl::u16(this->register_[Register::PC] + sext_pc_offset9);
 
         this->register_[dr] = this->read_memory(mem_location);
@@ -86,12 +87,14 @@ auto Virtual_Machine::run() -> void {
       }
       case Op_Code::ST: {
         // store register in memory
-        auto sr = destination(instruction);
+        const auto sr = destination(instruction);
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto pc_offset9      = instruction.to_ulong() & 0x1FF;
-        auto sext_pc_offset9 = sign_extend(static_cast<tl::u16>(pc_offset9), 9);
+        const auto pc_offset9 = instruction.to_ulong() & 0x1FF;
+        const auto sext_pc_offset9 =
+          sign_extend(static_cast<tl::u16>(pc_offset9), 9);
 
-        auto dest = tl::u16(this->register_[Register::PC] + sext_pc_offset9);
+        const auto dest =
+          tl::u16(this->register_[Register::PC] + sext_pc_offset9);
         this->write_memory(dest, this->register_[sr]);
         break;
       }
@@ -101,28 +104,28 @@ auto Virtual_Machine::run() -> void {
         if (instruction.test(11)) {  // pc_offset11 mode, JSR
 
           // NOLINTNEXTLINE(hicpp-signed-bitwise)
-          auto pc_offset11 = instruction.to_ulong() & 0x7FF;
-          auto sext_pc_offset11 =
+          const auto pc_offset11 = instruction.to_ulong() & 0x7FF;
+          const auto sext_pc_offset11 =
             sign_extend(static_cast<tl::u16>(pc_offset11), 11);
           this->register_[Register::PC] += sext_pc_offset11;
         } else {  // baseR mode, JSRR
 
           // NOLINTNEXTLINE(hicpp-signed-bitwise)
-          auto base_register = (instruction >> 6).to_ulong() & 0x7;
+          const auto base_register = (instruction >> 6).to_ulong() & 0x7;
           this->register_[Register::PC] =
             this->register_[static_cast<tl::u16>(base_register)];
         }
         break;
       }
       case Op_Code::AND: {
-        auto dr = destination(instruction);
+        const auto dr = destination(instruction);
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto sr1 = (instruction >> 6).to_ulong() & 0x7;
+        const auto sr1 = (instruction >> 6).to_ulong() & 0x7;
 
         if (instruction.test(5)) {  // immediate mode
           // bit [4:0] & 0b11111
           // NOLINTNEXTLINE(hicpp-signed-bitwise)
-          auto imm5 = instruction.to_ulong() & 0x1F;
+          const auto imm5 = instruction.to_ulong() & 0x1F;
           this->register_[dr] =
             this->register_[sr1] &
             sign_extend(static_cast<tl::u16>(imm5), 5);  // imm5 is 5bits.
@@ -130,7 +133,7 @@ auto Virtual_Machine::run() -> void {
         } else {  // register mode
 
           // NOLINTNEXTLINE(hicpp-signed-bitwise)
-          auto sr2            = instruction.to_ulong() & 0x7;
+          const auto sr2      = instruction.to_ulong() & 0x7;
           this->register_[dr] = this->register_[sr1] & this->register_[sr2];
         }
 
@@ -140,37 +143,37 @@ auto Virtual_Machine::run() -> void {
         break;
       }
       case Op_Code::LDR: {
-        auto dr = destination(instruction);
+        const auto dr = destination(instruction);
 
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto base_register = (instruction >> 6).to_ulong() & 0x7;
+        const auto base_register = (instruction >> 6).to_ulong() & 0x7;
 
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto offset6        = instruction.to_ulong() & 0x3F;
-        auto sext_offset6   = sign_extend(static_cast<tl::u16>(offset6), 6);
-        this->register_[dr] = this->read_memory(
+        const auto offset6      = instruction.to_ulong() & 0x3F;
+        const auto sext_offset6 = sign_extend(static_cast<tl::u16>(offset6), 6);
+        this->register_[dr]     = this->read_memory(
           static_cast<tl::u16>(this->register_[base_register] + sext_offset6));
         this->update_flags(dr);
         break;
       }
       case Op_Code::STR: {
-        auto sr = destination(instruction);
+        const auto sr = destination(instruction);
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto base_register = (instruction >> 6).to_ulong() & 0x7;
+        const auto base_register = (instruction >> 6).to_ulong() & 0x7;
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto offset6      = instruction.to_ulong() & 0x3F;
-        auto sext_offset6 = sign_extend(static_cast<tl::u16>(offset6), 6);
+        const auto offset6      = instruction.to_ulong() & 0x3F;
+        const auto sext_offset6 = sign_extend(static_cast<tl::u16>(offset6), 6);
 
-        auto dest =
+        const auto dest =
           static_cast<tl::u16>(this->register_[base_register] + sext_offset6);
         this->write_memory(dest, this->register_[sr]);
         break;
       }
       case Op_Code::NOT: {
-        auto dr = destination(instruction);
+        const auto dr = destination(instruction);
 
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto sr = (instruction >> 6).to_ulong() & 0x7;
+        const auto sr = (instruction >> 6).to_ulong() & 0x7;
 
         this->register_[dr] = ~this->register_[(static_cast<tl::u16>(sr))];
         this->update_flags(dr);
@@ -181,15 +184,16 @@ auto Virtual_Machine::run() -> void {
         // address. Then it loads the content of the address
         // of the address.
         // [addr] -> [addr] -> content
-        auto dr = destination(instruction);
+        const auto dr = destination(instruction);
 
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto pc_offset9      = instruction.to_ulong() & 0x1FF;
-        auto sext_pc_offset9 = sign_extend(static_cast<tl::u16>(pc_offset9), 9);
+        const auto pc_offset9 = instruction.to_ulong() & 0x1FF;
+        const auto sext_pc_offset9 =
+          sign_extend(static_cast<tl::u16>(pc_offset9), 9);
 
         // location of an address that stores the address of the value to load
         // into DR.
-        auto mem_location =
+        const auto mem_location =
           tl::u16(this->register_[Register::PC] + sext_pc_offset9);
 
         // We need to read_memory twice. See comment above.
@@ -201,20 +205,22 @@ auto Virtual_Machine::run() -> void {
       }
       case Op_Code::STI: {
         // stores an address of an address that contains an register.
-        auto sr = destination(instruction);
+        const auto sr = destination(instruction);
 
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto pc_offset9      = instruction.to_ulong() & 0x1FF;
-        auto sext_pc_offset9 = sign_extend(static_cast<tl::u16>(pc_offset9), 9);
+        const auto pc_offset9 = instruction.to_ulong() & 0x1FF;
+        const auto sext_pc_offset9 =
+          sign_extend(static_cast<tl::u16>(pc_offset9), 9);
 
-        auto dest = tl::u16(this->register_[Register::PC] + sext_pc_offset9);
+        const auto dest =
+          tl::u16(this->register_[Register::PC] + sext_pc_offset9);
         this->write_memory(this->read_memory(dest), this->register_[sr]);
         break;
       }
       case Op_Code::JMP: {
         // handles RET too
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto base_register = (instruction >> 6).to_ulong() & 0x7;
+        const auto base_register = (instruction >> 6).to_ulong() & 0x7;
         this->register_[Register::PC] =
           this->register_[static_cast<tl::u16>(base_register)];
         break;
@@ -222,11 +228,12 @@ auto Virtual_Machine::run() -> void {
       case Op_Code::LEA: {
         // the address itself is stored in the register.
         // instead of loading the content of the address.
-        auto dr = destination(instruction);
+        const auto dr = destination(instruction);
 
         // NOLINTNEXTLINE(hicpp-signed-bitwise)
-        auto pc_offset9      = instruction.to_ulong() & 0x1FF;
-        auto sext_pc_offset9 = sign_extend(static_cast<tl::u16>(pc_offset9), 9);
+        const auto pc_offset9 = instruction.to_ulong() & 0x1FF;
+        const auto sext_pc_offset9 =
+          sign_extend(static_cast<tl::u16>(pc_offset9), 9);
 
         this->register_[dr] = this->register_[Register::PC] + sext_pc_offset9;
         this->update_flags(dr);
@@ -241,16 +248,16 @@ auto Virtual_Machine::run() -> void {
             // Read a single character from the keyboard. The character is not
             // echoed onto the console. Its ASCII code is copied into R0. The
             // high eight bits of R0 are cleared.
-            auto ch                       = std::getchar();
+            const auto ch                 = std::getchar();
             this->register_[Register::R0] = static_cast<tl::u16>(ch);
             break;
           }
           case Trap::out: {
             // Write a character in R0[7:0] to the console display.
-            auto content = this->register_[Register::R0];
+            const auto content = this->register_[Register::R0];
 
             // NOLINTNEXTLINE(hicpp-signed-bitwise)
-            auto ch = content & 0x7F;
+            const auto ch = content & 0x7F;
             fmt::print("{}", static_cast<char>(ch));
             break;
           }
@@ -264,7 +271,7 @@ auto Virtual_Machine::run() -> void {
 
             // increment the address until we find an address with nothing in it
             while (this->memory_[start_addr]) {
-              auto ch = static_cast<char>(this->read_memory(start_addr));
+              const auto ch = static_cast<char>(this->read_memory(start_addr));
               fmt::print("{}", ch);
               ++start_addr;
             }
@@ -276,7 +283,7 @@ auto Virtual_Machine::run() -> void {
             // its ASCII code is copied into R0. The high eight bits of R0 are
             // cleared.
             fmt::print("Enter a character: ");
-            auto ch = std::getchar();
+            const auto ch = std::getchar();
             fmt::print("\n{}", ch);
             this->register_[Register::R0] = static_cast<tl::u16>(ch);
             break;
@@ -296,14 +303,14 @@ auto Virtual_Machine::run() -> void {
             auto start_addr = this->register_[Register::R0];
 
             while (this->memory_[start_addr]) {
-              auto value = this->memory_[start_addr];
+              const auto value = this->memory_[start_addr];
 
               // NOLINTNEXTLINE(hicpp-signed-bitwise)
-              auto first_ch = value & 0xFF;
+              const auto first_ch = value & 0xFF;
               fmt::print("{}", static_cast<char>(first_ch));
 
               // NOLINTNEXTLINE(hicpp-signed-bitwise)
-              auto second_ch = value >> 8;
+              const auto second_ch = value >> 8;
 
               if (second_ch) { fmt::print("{}", static_cast<char>(second_ch)); }
               ++start_addr;

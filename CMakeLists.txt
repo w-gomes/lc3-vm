@@ -18,8 +18,9 @@ target_include_directories(project_options
 
 )
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set_target_properties(project_options 
+  PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON
+)
 
 
 ############################ warnings, sanitizers ############################

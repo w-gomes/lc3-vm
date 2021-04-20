@@ -21,9 +21,9 @@
 
 // Input buffering windows
 #ifdef _WIN32
-HANDLE hStdin = INVALID_HANDLE_VALUE;
-DWORD fdwMode;
-DWORD fdwOldMode;
+HANDLE hStdin = INVALID_HANDLE_VALUE;  // NOLINT
+DWORD fdwMode;                         // NOLINT
+DWORD fdwOldMode;                      // NOLINT
 
 auto check_key() -> uint16_t {
   return WaitForSingleObject(hStdin, 1000) == WAIT_OBJECT_0 && _kbhit();
@@ -34,7 +34,7 @@ auto disable_input_buffering() -> void {
   GetConsoleMode(hStdin, &fdwOldMode);  // save old mode
 
   // no input echo and return when one or more characters are available
-  fdwMode = fdwOldMode ^ ENABLE_ECHO_INPUT ^ ENABLE_LINE_INPUT;
+  fdwMode = fdwOldMode ^ ENABLE_ECHO_INPUT ^ ENABLE_LINE_INPUT;  // NOLINT
 
   SetConsoleMode(hStdin, fdwMode);  // set new mode
   FlushConsoleInputBuffer(hStdin);  // clear buffer
@@ -73,11 +73,12 @@ auto restore_input_buffering() -> void {
 auto handle_interrupt([[maybe_unused]] int signal) -> void {
   restore_input_buffering();
   fmt::print("\n");
-  std::exit(-2);
+  std::exit(-2);  // NOLINT
 }
 
 namespace vm {
-auto sign_extend(tl::u16 x, tl::u16 bit_count) noexcept -> tl::u16 {
+[[nodiscard]] auto sign_extend(tl::u16 x, tl::u16 bit_count) noexcept
+  -> tl::u16 {
   // extends a bit
   // e.g. 5bit -> 16bit
   //
@@ -86,7 +87,8 @@ auto sign_extend(tl::u16 x, tl::u16 bit_count) noexcept -> tl::u16 {
   return x;
 }
 
-auto destination(const std::bitset<16> &instr) noexcept -> tl::u16 {
+[[nodiscard]] auto destination(const std::bitset<16> &instr) noexcept
+  -> tl::u16 {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return static_cast<tl::u16>((instr >> 9).to_ulong() & 0x7);
 }
